@@ -1,35 +1,60 @@
-name: create docker image and push it to DockerHub
+name: Create Docker Image and Push It to DockerHub
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   docker:
     runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v2
-      -
-        name: Set up JDK
+
+      - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 1.17
-      - 
-        name: Build with Maven
+          java-version: 17
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          while ! pg_isready -h localhost -p 5432; do
+            echo "$(date) - waiting for database to start"
+            sleep 2
+          done
+
+      - name: Build with Maven
         run: mvn clean install
-      -
-        name: Set up Docker Build
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: password
+
+      - name: Set up Docker Build
         uses: docker/setup-buildx-action@v1
-      -
-        name: Login to DockerHub
+
+      - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      -
-        name: Build and push
+
+      - name: Build and push
         uses: docker/build-push-action@v2
         with:
           context: .
