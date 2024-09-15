@@ -28,6 +28,7 @@ public class SecurityApplication {
 			AuthenticationService service
 	) {
 		return args -> {
+			log.info("Creating user Admin with role admin");
 			var admin = RegisterRequest.builder()
 					.firstname("Admin")
 					.lastname("Admin")
@@ -44,9 +45,10 @@ public class SecurityApplication {
 				// do nothing
 			}
 
+			log.info("Creating user Manager with role manager");
 			var manager = RegisterRequest.builder()
-					.firstname("Admin")
-					.lastname("Admin")
+					.firstname("Manager")
+					.lastname("Manger")
 					.email("manager@mail.com")
 					.password("password")
 					.role(MANAGER)
