@@ -1,6 +1,7 @@
 package com.alibou.security.auth;
 
 import com.alibou.security.customException.UserAlreadyExistsException;
+import com.alibou.security.user.Role;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class AuthenticationController {
   public ResponseEntity<AuthenticationResponse> register(
           @RequestBody RegisterRequest request
   ) {
+    request.setRole(Role.USER);
     try {
       return ResponseEntity.ok(service.register(request));
     } catch (UserAlreadyExistsException e) {
