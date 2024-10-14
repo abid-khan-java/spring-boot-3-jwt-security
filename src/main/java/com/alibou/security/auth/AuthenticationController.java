@@ -1,8 +1,11 @@
 package com.alibou.security.auth;
 
+import com.alibou.security.customException.UserAlreadyExistsException;
+import com.alibou.security.user.Role;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,10 +23,17 @@ public class AuthenticationController {
 
   @PostMapping("/register")
   public ResponseEntity<AuthenticationResponse> register(
-      @RequestBody RegisterRequest request
+          @RequestBody RegisterRequest request
   ) {
-    return ResponseEntity.ok(service.register(request));
+    request.setRole(Role.USER);
+    try {
+      return ResponseEntity.ok(service.register(request));
+    } catch (UserAlreadyExistsException e) {
+      return ResponseEntity.status(HttpStatus.CONFLICT)
+              .body(new AuthenticationResponse(e.getMessage()));
+    }
   }
+
   @PostMapping("/authenticate")
   public ResponseEntity<AuthenticationResponse> authenticate(
       @RequestBody AuthenticationRequest request
@@ -38,6 +48,5 @@ public class AuthenticationController {
   ) throws IOException {
     service.refreshToken(request, response);
   }
-
 
 }

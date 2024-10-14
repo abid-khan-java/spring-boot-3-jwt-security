@@ -16,4 +16,10 @@ public class AuthenticationResponse {
   private String accessToken;
   @JsonProperty("refresh_token")
   private String refreshToken;
+  @JsonProperty("error")
+  private String errorMessage;
+
+  public AuthenticationResponse(String errorMessage) {
+    this.errorMessage = errorMessage;
+  }
 }
