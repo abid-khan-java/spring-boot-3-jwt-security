@@ -4,7 +4,6 @@ import com.alibou.security.user.model.ChangePasswordRequest;
 import com.alibou.security.user.model.User;
 import com.alibou.security.user.repository.UserRepository;
 import com.alibou.security.user.service.UserService;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
